@@ -47,7 +47,27 @@
     mode: 0644
   notify:
     - restart cadvisor
+- name: Centos Allow all access to tcp port 9100
+  when: ansible_os_family == "CentOS Linux"
+  ansible.posix.firewalld:
+    port: "{{ cadvisor_port }}"/tcp
+    permanent: yes
+    state: enabled
 
+- name: Allow all access to tcp port 9100
+  when: ansible_os_family == "ubuntu"
+  community.general.ufw:
+    rule: allow
+    port: "{{ cadvisor_port }}"
+    proto: tcp
+
+- name: Allow all access to tcp port 9100
+  when: ansible_os_family == "debian"
+  community.general.ufw:
+    rule: allow
+    port: "{{ cadvisor_port }}"
+    proto: tcp
+    
 - name: cadvisor | enable and start server systemd
   become: true
   systemd:
